@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCFS Documentation - CPU Scheduling</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="doc.css">
+    <script src="https://kit.fontawesome.com/a4e9391705.js" crossorigin="anonymous"></script>
+
+    <script>hljs.highlightAll();</script>
+
+    <script>hljs.highlightAll();</script>
+    <script src="https://kit.fontawesome.com/a4e9391705.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        /* Updated Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .main-header {
+            width: calc(100% - 106px);
+            margin: 0 53px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #e6f0ff;
+        }
+
+        .nav-menu a.active {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+        }
+
+        .back-button {
+            font-size: 14px;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        .doc-container {
+            max-width: 1200px;
+            margin: 70px auto 40px auto;
+            padding: 20px;
+        }
+
+        .doc-section {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 80px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            scroll-margin-top: 100px;
+            /* Prevents header overlap */
+        }
+
+        .doc-section h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .doc-section p {
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .example-table th,
+        .example-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .example-table th {
+            background-color: #f5f5f5;
+        }
+
+        .gantt-example {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .gantt-block {
+            min-width: 60px;
+            height: 40px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e3f2fd;
+        }
+
+        .gantt-time {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="nav-bar">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Calculator
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#FCFS">FCFS</a></li>
+                <li><a href="#SJF">SJF</a></li>
+                <li><a href="#SRTF">SRTF</a></li>
+                <li><a href="#RR">RR</a></li>
+                <li><a href="#Priority">Priority</a></li>
+                <li><a href="#PP">Preemptive Priority</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main class="doc-container">
+            <div id="FCFS" class="doc-section">
+
+
+                <div>
+                    <h1>First Come First Serve (FCFS) - Non-Preemptive CPU Scheduling</h1>
+                    <p>First Come First Serve (FCFS) is one of the simplest CPU scheduling algorithms. It follows a
+                        non-preemptive scheduling approach where processes are executed in the order they arrive in the
+                        ready queue.</p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Non-preemptive:</strong> Once a process starts executing, it runs to completion</li>
+                        <li><strong>Simple Implementation:</strong> Easy to understand and implement</li>
+                        <li><strong>Fairness:</strong> Processes are served in the order of their arrival</li>
+                        <li><strong>No Starvation:</strong> Every process gets a chance to execute</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>Processes arrive with their arrival time and burst time</li>
+                        <li>Processes are sorted based on their arrival time</li>
+                        <li>The CPU executes processes in the order they arrived</li>
+                        <li>Each process runs to completion before the next process starts</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time at which a process completes its execution</li>
+                        <li><strong>Turnaround Time (TAT):</strong> Total time taken from arrival to completion
+                            <br>TAT = Completion Time - Arrival Time
+                        </li>
+                        <li><strong>Waiting Time (WT):</strong> Time a process spends waiting in the ready queue
+                            <br>WT = Turnaround Time - Burst Time
+                        </li>
+                        <li><strong>Average Waiting Time:</strong> Sum of waiting times divided by number of processes
+                        </li>
+                        <li><strong>Average Turnaround Time:</strong> Sum of turnaround times divided by number of
+                            processes
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes:</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>1</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>2</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-4</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">4-7</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">7-8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>Simple to implement and understand</li>
+                        <li>Fair to all processes</li>
+                        <li>No starvation</li>
+                        <li>Predictable execution order</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>May lead to convoy effect (short processes waiting behind long ones)</li>
+                        <li>Not optimal for minimizing waiting time</li>
+                        <li>No consideration of process priority</li>
+                        <li>Can lead to poor performance if processes have varying burst times</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Implementation</h2>
+
+
+                    <pre>
+                <code>
+                    function FCFS(at, bt) {
+                        const n = at.length;
+                      
+                        // Combine and sort based on arrival time
+                        const combined = at.map((value, index) => [
+                          parseInt(value),
+                          parseInt(bt[index]),
+                          index + 1,
+                        ]);
+                      
+                        combined.sort((a, b) => a[0] - b[0]);
+                      
+                        let ct = [];
+                        let tat = [];
+                        let wt = [];
+                        let ghantt = [];
+                      
+                        let currenttime = 0;
+                        let totalwait = 0;
+                        let totaltat = 0;
+                      
+                        const sortedArrival = [];
+                        const sortedBurst = [];
+                        const sortedID = [];
+                      
+                        for (let i = 0; i < n; i++) {
+                          const [arrival, burst, pid] = combined[i];
+                          sortedArrival.push(arrival);
+                          sortedBurst.push(burst);
+                          sortedID.push(pid);
+                      
+                          if (currenttime < arrival) {
+                            currenttime = arrival;
+                            ghantt.push([currenttime, 0]);
+                          }
+                      
+                          ct[i] = currenttime + burst;
+                          ghantt.push([ct[i], 1]);
+                      
+                          tat[i] = ct[i] - arrival;
+                          wt[i] = tat[i] - burst;
+                      
+                          totalwait += wt[i];
+                          totaltat += tat[i];
+                      
+                          currenttime = ct[i];
+                        }
+                      
+                        addtable(sortedArrival, sortedBurst, ct, tat, wt, sortedID);
+                        adddata(totalwait / n, totaltat / n);
+                      
+                        chartfcfs(ghantt, sortedID);
+                      }
+                      
+                </code>
+                   </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "First Come First Serve - (FCFS)" from the dropdown menu</li>
+                        <li>Enter arrival times for each process (comma-separated)</li>
+                        <li>Enter burst times for each process (comma-separated)</li>
+                        <li>Click "Calculate" to see the results</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="SJF" class="doc-section">
+                <div>
+                    <h1>Shortest Job First (SJF) - Non-Preemptive CPU Scheduling</h1>
+                    <p>Shortest Job First (SJF) is a non-preemptive CPU scheduling algorithm where the process with the
+                        smallest burst time is selected from the ready queue. It aims to reduce the average waiting time
+                        of processes.</p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Non-preemptive:</strong> Once a process starts, it completes fully</li>
+                        <li><strong>Optimized Waiting Time:</strong> Tends to result in the least average waiting time
+                        </li>
+                        <li><strong>Requires Burst Time Info:</strong> Scheduler must know burst times in advance</li>
+                        <li><strong>Starvation Possible:</strong> Long processes may get indefinitely delayed</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>All processes are sorted based on arrival time</li>
+                        <li>At every CPU idle point, select the process with the shortest burst time among arrived
+                            processes</li>
+                        <li>The selected process executes to completion (non-preemptive)</li>
+                        <li>Repeat until all processes are executed</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time when a process finishes execution</li>
+                        <li><strong>Turnaround Time (TAT):</strong> TAT = Completion Time - Arrival Time</li>
+                        <li><strong>Waiting Time (WT):</strong> WT = Turnaround Time - Burst Time</li>
+                        <li><strong>Average Waiting Time:</strong> Average of all waiting times</li>
+                        <li><strong>Average Turnaround Time:</strong> Average of all turnaround times</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes:</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>2</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>4</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-7</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">7-8</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">8-12</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>Minimizes average waiting time</li>
+                        <li>Simple conceptually</li>
+                        <li>Effective for batch systems where burst time is known in advance</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>Starvation for longer processes</li>
+                        <li>Requires precise knowledge of burst time</li>
+                        <li>Difficult to implement in real-time systems</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Implementation</h2>
+                    <pre>
+<code>
+function SJF(at, bt) {
+    const n = at.length;
+    const processes = at.map((arrival, i) => ({
+        id: i + 1,
+        at: parseInt(arrival),
+        bt: parseInt(bt[i]),
+        done: false
+    }));
+
+    let currentTime = 0, completed = 0;
+    const ct = [], tat = [], wt = [], gantt = [];
+    let totalWT = 0, totalTAT = 0;
+    const sortedArrival = [], sortedBurst = [], sortedID = [];
+
+    while (completed < n) {
+        let idx = -1, minBT = Infinity;
+        for (let i = 0; i < n; i++) {
+            if (!processes[i].done && processes[i].at <= currentTime && processes[i].bt < minBT) {
+                minBT = processes[i].bt;
+                idx = i;
+            }
+        }
+
+        if (idx === -1) {
+            currentTime++;
+            continue;
+        }
+
+        const p = processes[idx];
+        sortedArrival.push(p.at);
+        sortedBurst.push(p.bt);
+        sortedID.push(p.id);
+
+        if (currentTime < p.at) currentTime = p.at;
+        currentTime += p.bt;
+
+        ct[idx] = currentTime;
+        tat[idx] = ct[idx] - p.at;
+        wt[idx] = tat[idx] - p.bt;
+
+        gantt.push([ct[idx], 1]);
+        p.done = true;
+        totalWT += wt[idx];
+        totalTAT += tat[idx];
+        completed++;
+    }
+
+    addtable(sortedArrival, sortedBurst, ct, tat, wt, sortedID);
+    adddata(totalWT / n, totalTAT / n);
+    chartfcfs(gantt, sortedID); // same Gantt chart logic can be reused
+}
+</code>
+        </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "Shortest Job First - (SJF)" from the dropdown</li>
+                        <li>Enter arrival times and burst times for each process</li>
+                        <li>Click "Calculate" to view results and Gantt chart</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="SRTF" class="doc-section">
+                <div>
+                    <h1>Shortest Remaining Time First (SRTF) - Preemptive CPU Scheduling</h1>
+                    <p>Shortest Remaining Time First (SRTF) is the preemptive version of Shortest Job First (SJF). At
+                        every unit of time, the CPU selects the process with the smallest remaining burst time among the
+                        arrived processes. If a new process arrives with a shorter remaining time, it preempts the
+                        currently running process.</p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Preemptive:</strong> A running process can be interrupted by a new process with a
+                            shorter remaining time</li>
+                        <li><strong>Optimal Average Waiting Time:</strong> In theory, gives better performance than SJF
+                        </li>
+                        <li><strong>Complex:</strong> Requires frequent context switches and tracking of remaining time
+                        </li>
+                        <li><strong>Starvation Risk:</strong> Long processes may suffer due to frequent preemptions</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>Each time unit, check for the process with the shortest remaining time among the arrived
+                            ones</li>
+                        <li>If a process with a shorter remaining time arrives, preempt the current one</li>
+                        <li>Execute the selected process for 1 time unit</li>
+                        <li>Repeat until all processes complete</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time when a process finishes execution</li>
+                        <li><strong>Turnaround Time (TAT):</strong> TAT = Completion Time - Arrival Time</li>
+                        <li><strong>Waiting Time (WT):</strong> WT = Turnaround Time - Burst Time</li>
+                        <li><strong>Average Waiting Time:</strong> Average of all WT values</li>
+                        <li><strong>Average Turnaround Time:</strong> Average of all TAT values</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes:</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>2</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>4</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-2</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">2-4</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">4-5</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">5-6</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">6-11</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>More optimal than FCFS and SJF for minimizing average waiting time</li>
+                        <li>Preemptive nature handles dynamic process arrivals well</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>Frequent context switches can add overhead</li>
+                        <li>Requires accurate estimation or knowledge of burst times</li>
+                        <li>May cause starvation for longer processes</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Implementation</h2>
+                    <pre>
+<code>
+function SRTF(at, bt) {
+  const n = at.length;
+  let time = 0, completed = 0, avgwt = 0, avgtat = 0;
+
+  at = at.map(Number);
+  bt = bt.map(Number);
+
+  const pid = Array.from({ length: n }, (_, i) => i + 1);
+  const remaining = [...bt];
+  const ct = Array(n).fill(0);
+  const tat = Array(n).fill(0);
+  const wt = Array(n).fill(0);
+  const finished = Array(n).fill(false);
+
+  const ghantt = [];
+  const id = [];
+
+  while (completed < n) {
+    let idx = -1, min = Number.MAX_SAFE_INTEGER;
+
+    for (let i = 0; i < n; i++) {
+      if (!finished[i] && at[i] <= time && remaining[i] < min && remaining[i] > 0) {
+        min = remaining[i];
+        idx = i;
+      }
+    }
+
+    if (idx === -1) {
+      time++;
+      ghantt.push([time, 0]);
+      id.push(0);
+    } else {
+      remaining[idx]--;
+      time++;
+      ghantt.push([time, 1]);
+      id.push(pid[idx]);
+
+      if (remaining[idx] === 0) {
+        ct[idx] = time;
+        tat[idx] = ct[idx] - at[idx];
+        wt[idx] = tat[idx] - bt[idx];
+        avgtat += tat[idx];
+        avgwt += wt[idx];
+        finished[idx] = true;
+        completed++;
+      }
+    }
+  }
+
+  adddata(avgwt / n, avgtat / n);
+  addtable(at, bt, ct, tat, wt, pid);
+  reduceGhanttchart(ghantt, id);
+}
+</code>
+        </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "Shortest Remaining Time First - (SRTF)" from the dropdown</li>
+                        <li>Enter arrival and burst times (comma-separated)</li>
+                        <li>Click "Calculate" to view computed results and Gantt chart</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="RR" class="doc-section">
+                <div>
+                    <h1>Round Robin (RR) - Preemptive CPU Scheduling</h1>
+                    <p>Round Robin (RR) is a preemptive CPU scheduling algorithm that assigns a fixed time quantum to
+                        each process in the ready queue. If a process doesn't finish during its allotted time, it is
+                        placed at the end of the queue and given another turn later. This ensures fairness and
+                        responsiveness, making it ideal for time-sharing systems.</p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Preemptive:</strong> Processes are forcibly switched after each quantum</li>
+                        <li><strong>Fairness:</strong> All processes get equal CPU time in turns</li>
+                        <li><strong>Time Quantum:</strong> Core parameter that defines how long a process can run before
+                            switching</li>
+                        <li><strong>Prevents Starvation:</strong> Every process eventually gets CPU time</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>Place all arrived processes in a ready queue (FIFO)</li>
+                        <li>Give the CPU to the first process in the queue for one time quantum</li>
+                        <li>If the process finishes, remove it from the queue</li>
+                        <li>If not, move it to the end of the queue with updated remaining time</li>
+                        <li>Repeat the cycle until all processes are complete</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time when a process finishes</li>
+                        <li><strong>Turnaround Time (TAT):</strong> TAT = Completion Time - Arrival Time</li>
+                        <li><strong>Waiting Time (WT):</strong> WT = Turnaround Time - Burst Time</li>
+                        <li><strong>Average Waiting Time:</strong> Total of all WT / number of processes</li>
+                        <li><strong>Average Turnaround Time:</strong> Total of all TAT / number of processes</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes with a time quantum of 2 units:</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>1</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>2</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-2</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">2-4</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">4-5</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">5-7</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">7-8</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">8-9</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>Fair to all processes</li>
+                        <li>Suitable for interactive/time-sharing systems</li>
+                        <li>Prevents starvation</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>Performance depends on quantum size</li>
+                        <li>Too small quantum → excessive context switching</li>
+                        <li>Too large quantum → behaves like FCFS</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Implementation</h2>
+                    <pre>
+<code>
+function RR(at, bt, quant) {
+  class Process {
+    constructor(AT, BT, id) {
+      this.AT = AT;
+      this.BT = BT;
+      this.remainingBT = BT;
+      this.FT = 0;
+      this.WT = 0;
+      this.TAT = 0;
+      this.id = id;
+      this.startTimes = [];
+    }
+  }
+
+  const n = at.length;
+  const processes = at.map((a, i) => new Process(parseInt(a), parseInt(bt[i]), i + 1));
+
+  let time = 0, remaining = n;
+  let ghantt = [], xid = [];
+  let totalWT = 0, totalTAT = 0;
+  let queue = [];
+  let visited = new Array(n).fill(false);
+
+  for (let i = 0; i < n; i++) {
+    if (processes[i].AT === 0) {
+      queue.push(i);
+      visited[i] = true;
+    }
+  }
+
+  while (remaining > 0) {
+    if (queue.length === 0) {
+      time++;
+      ghantt.push([time, 0]);
+      xid.push(0);
+      for (let i = 0; i < n; i++) {
+        if (!visited[i] && processes[i].AT <= time) {
+          queue.push(i);
+          visited[i] = true;
+        }
+      }
+      continue;
+    }
+
+    let idx = queue.shift();
+    let p = processes[idx];
+    p.startTimes.push(time);
+    let execTime = Math.min(quant, p.remainingBT);
+    time += execTime;
+    p.remainingBT -= execTime;
+
+    ghantt.push([time, 1]);
+    xid.push(p.id);
+
+    for (let i = 0; i < n; i++) {
+      if (!visited[i] && processes[i].AT <= time) {
+        queue.push(i);
+        visited[i] = true;
+      }
+    }
+
+    if (p.remainingBT > 0) {
+      queue.push(idx);
+    } else {
+      p.FT = time;
+      p.TAT = p.FT - p.AT;
+      p.WT = p.TAT - p.BT;
+      totalWT += p.WT;
+      totalTAT += p.TAT;
+      remaining--;
+    }
+  }
+
+  at = processes.map(p => p.AT);
+  bt = processes.map(p => p.BT);
+  const ct = processes.map(p => p.FT);
+  const tat = processes.map(p => p.TAT);
+  const wt = processes.map(p => p.WT);
+  const pid = processes.map(p => p.id);
+
+  adddata(totalWT / n, totalTAT / n);
+  reduceGhanttchart(ghantt, xid);
+  addtable(at, bt, ct, tat, wt, pid);
+}
+</code>
+        </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "Round Robin - (RR)" from the dropdown</li>
+                        <li>Enter arrival and burst times (comma-separated)</li>
+                        <li>Enter time quantum (a small integer like 2 or 3)</li>
+                        <li>Click "Calculate" to see results and Gantt chart</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="Priority" class=" doc-section">
+                <div>
+                    <h1>Priority Scheduling - Non-Preemptive CPU Scheduling</h1>
+                    <p>Priority Scheduling is a non-preemptive CPU scheduling algorithm where each process is assigned a
+                        priority. The process with the highest priority (lowest numerical value) is executed first. If
+                        multiple processes have the same priority, they are scheduled according to their arrival time.
+                    </p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Priority-Based:</strong> Processes with higher priority are selected first</li>
+                        <li><strong>Non-Preemptive:</strong> Once a process starts, it runs to completion</li>
+                        <li><strong>Deterministic:</strong> Scheduling depends on static priority values</li>
+                        <li><strong>Possibility of Starvation:</strong> Low priority processes might wait indefinitely
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>All processes are sorted based on arrival time</li>
+                        <li>Among the available processes at a given time, select the one with the highest priority
+                            (lowest number)</li>
+                        <li>Execute the selected process completely</li>
+                        <li>Repeat until all processes are completed</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time when a process finishes execution</li>
+                        <li><strong>Turnaround Time (TAT):</strong> TAT = Completion Time - Arrival Time</li>
+                        <li><strong>Waiting Time (WT):</strong> WT = Turnaround Time - Burst Time</li>
+                        <li><strong>Average Waiting Time:</strong> Total WT / number of processes</li>
+                        <li><strong>Average Turnaround Time:</strong> Total TAT / number of processes</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes with their priorities (lower number = higher priority):</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                            <th>Priority</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>4</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>3</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-4</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">4-7</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">7-8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>Flexibility through prioritization</li>
+                        <li>Can be customized to system needs (e.g., user-defined priorities)</li>
+                        <li>Efficient for critical task execution</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>Starvation of low-priority processes</li>
+                        <li>Needs priority values beforehand</li>
+                        <li>Not suitable when fairness is important</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Implementation</h2>
+                    <pre>
+<code>
+function priority(at, bt, pr) {
+  const n = at.length;
+  const processes = [];
+
+  for (let i = 0; i < n; i++) {
+    processes.push({
+      id: i + 1,
+      AT: parseInt(at[i]),
+      BT: parseInt(bt[i]),
+      priority: parseInt(pr[i]),
+      WT: 0,
+      TAT: 0,
+    });
+  }
+
+  let currentTime = 0;
+  let completed = [];
+  let ghantt = [];
+  let pidTimeline = [];
+
+  processes.sort((a, b) => a.AT - b.AT);
+
+  while (completed.length < n) {
+    let available = processes.filter(p => p.AT <= currentTime && !p.completed);
+
+    if (available.length === 0) {
+      currentTime = processes.find(p => !p.completed).AT;
+      ghantt.push([currentTime, 0]);
+      continue;
+    }
+
+    available.sort((a, b) => {
+      if (a.priority === b.priority) return a.AT - b.AT;
+      return a.priority - b.priority;
+    });
+
+    let current = available[0];
+    current.WT = currentTime - current.AT;
+    current.TAT = current.WT + current.BT;
+    current.completed = true;
+
+    currentTime += current.BT;
+    ghantt.push([currentTime, 1]);
+    pidTimeline.push(current.id);
+    completed.push(current);
+  }
+
+  const atList = completed.map(p => p.AT);
+  const btList = completed.map(p => p.BT);
+  const ctList = completed.map(p => p.AT + p.TAT);
+  const tatList = completed.map(p => p.TAT);
+  const wtList = completed.map(p => p.WT);
+  const pidList = completed.map(p => p.id);
+
+  const avgWT = (wtList.reduce((sum, w) => sum + w, 0) / n).toFixed(2);
+  const avgTAT = (tatList.reduce((sum, t) => sum + t, 0) / n).toFixed(2);
+
+  addtable(atList, btList, ctList, tatList, wtList, pidList);
+  chartfcfs(ghantt, pidTimeline);
+  adddata.innerHTML = `Avg. W.T : ${avgWT} <br/> Avg. T.AT : ${avgTAT}`;
+}
+</code>
+        </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "Priority Scheduling" from the dropdown</li>
+                        <li>Enter arrival time, burst time, and priority for each process (comma-separated)</li>
+                        <li>Click "Calculate" to view the Gantt chart and performance metrics</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="PP" class="doc-section">
+                <div>
+                    <h1>Priority Scheduling - Preemptive (PP)</h1>
+                    <p>Preemptive Priority Scheduling is a CPU scheduling algorithm where the CPU always executes the
+                        process with the highest priority (lowest numerical value). If a new process arrives with a
+                        higher priority than the current one, it preempts the running process and starts execution
+                        immediately.</p>
+                </div>
+
+                <div>
+                    <h2>Key Characteristics</h2>
+                    <ul>
+                        <li><strong>Preemptive:</strong> A higher priority process can interrupt a running
+                            lower-priority one</li>
+                        <li><strong>Priority-Based:</strong> Processes are selected based on priority (lower number =
+                            higher priority)</li>
+                        <li><strong>Dynamic:</strong> System continuously checks for newly arrived higher priority
+                            processes</li>
+                        <li><strong>Starvation Risk:</strong> Low-priority processes may never get executed</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>How It Works</h2>
+                    <ol>
+                        <li>Processes are sorted by arrival time</li>
+                        <li>At each time unit, the scheduler picks the available process with the highest priority</li>
+                        <li>If a higher priority process arrives, it preempts the current one</li>
+                        <li>The selected process runs for 1 time unit before priority is checked again</li>
+                        <li>Continue until all processes are completed</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h2>Performance Metrics</h2>
+                    <ul>
+                        <li><strong>Completion Time (CT):</strong> Time when a process finishes execution</li>
+                        <li><strong>Turnaround Time (TAT):</strong> TAT = Completion Time - Arrival Time</li>
+                        <li><strong>Waiting Time (WT):</strong> WT = Turnaround Time - Burst Time</li>
+                        <li><strong>Average Waiting Time:</strong> Average of all WT values</li>
+                        <li><strong>Average Turnaround Time:</strong> Average of all TAT values</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Example</h2>
+                    <p>Consider the following processes with priorities:</p>
+                    <table class="example-table">
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                            <th>Priority</th>
+                        </tr>
+                        <tr>
+                            <td>P1</td>
+                            <td>0</td>
+                            <td>5</td>
+                            <td>3</td>
+                        </tr>
+                        <tr>
+                            <td>P2</td>
+                            <td>1</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>P3</td>
+                            <td>2</td>
+                            <td>4</td>
+                            <td>2</td>
+                        </tr>
+                    </table>
+
+                    <p>Gantt Chart:</p>
+                    <div class="gantt-example">
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">0-1</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P2</div>
+                            <div class="gantt-time">1-4</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P3</div>
+                            <div class="gantt-time">4-8</div>
+                        </div>
+                        <div>
+                            <div class="gantt-block">P1</div>
+                            <div class="gantt-time">8-12</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Advantages</h2>
+                    <ul>
+                        <li>Gives priority to urgent tasks</li>
+                        <li>Improves responsiveness for high-priority processes</li>
+                        <li>Efficient for real-time systems where priorities matter</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Disadvantages</h2>
+                    <ul>
+                        <li>Starvation for low-priority processes</li>
+                        <li>Requires frequent context switching</li>
+                        <li>Priorities must be known or assigned dynamically</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2>Implementation</h2>
+                    <pre>
+<code>
+function preemptivepriority(at, bt, pt) {
+  class Process {
+    constructor(id, arrivalTime, burstTime, priority) {
+      this.id = id;
+      this.arrivalTime = arrivalTime;
+      this.burstTime = burstTime;
+      this.priority = priority;
+      this.remainingTime = burstTime;
+      this.completionTime = 0;
+      this.turnaroundTime = 0;
+      this.waitingTime = 0;
+    }
+  }
+
+  function scheduleProcesses(processes) {
+    processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+    
+    let currentTime = 0;
+    let completedProcesses = 0;
+    const n = processes.length;
+    const ghantt = [];
+    const xid = [];
+
+    while (completedProcesses < n) {
+      const availableProcesses = processes.filter(
+        p => p.arrivalTime <= currentTime && p.remainingTime > 0
+      );
+
+      if (availableProcesses.length === 0) {
+        currentTime++;
+        ghantt.push([currentTime, 0]);
+        xid.push(0);
+        continue;
+      }
+
+      availableProcesses.sort((a, b) => 
+        a.priority - b.priority || a.remainingTime - b.remainingTime
+      );
+
+      const currentProcess = availableProcesses[0];
+      currentProcess.remainingTime--;
+      currentTime++;
+      ghantt.push([currentTime, 1]);
+      xid.push(currentProcess.id);
+
+      if (currentProcess.remainingTime === 0) {
+        completedProcesses++;
+        currentProcess.completionTime = currentTime;
+      }
+    }
+
+    let totalTAT = 0, totalWT = 0;
+    const results = processes.map(process => {
+      process.turnaroundTime = process.completionTime - process.arrivalTime;
+      process.waitingTime = process.turnaroundTime - process.burstTime;
+      totalTAT += process.turnaroundTime;
+      totalWT += process.waitingTime;
+      
+      return {
+        id: process.id,
+        arrivalTime: process.arrivalTime,
+        burstTime: process.burstTime,
+        completionTime: process.completionTime,
+        turnaroundTime: process.turnaroundTime,
+        waitingTime: process.waitingTime
+      };
+    });
+
+    adddata.innerHTML = `Avg. W.T : ${(totalWT / n).toFixed(2)} <br/> Avg. T.A.T : ${(totalTAT / n).toFixed(2)}`;
+    
+    const { arrivalTimes, burstTimes, completionTimes, turnaroundTimes, waitingTimes, ids } = results.reduce((acc, curr) => {
+      acc.arrivalTimes.push(curr.arrivalTime);
+      acc.burstTimes.push(curr.burstTime);
+      acc.completionTimes.push(curr.completionTime);
+      acc.turnaroundTimes.push(curr.turnaroundTime);
+      acc.waitingTimes.push(curr.waitingTime);
+      acc.ids.push(curr.id);
+      return acc;
+    }, {
+      arrivalTimes: [], burstTimes: [], completionTimes: [], 
+      turnaroundTimes: [], waitingTimes: [], ids: []
+    });
+
+    addtable(arrivalTimes, burstTimes, completionTimes, turnaroundTimes, waitingTimes, ids);
+    reduceGhanttchart(ghantt, xid);
+  }
+
+  const processes = at.map((_, i) => 
+    new Process(i + 1, parseInt(at[i]), parseInt(bt[i]), parseInt(pt[i]))
+  );
+
+  scheduleProcesses(processes);
+}
+</code>
+        </pre>
+                </div>
+
+                <div>
+                    <h2>How to Use in Calculator</h2>
+                    <ol>
+                        <li>Select "Preemptive Priority - (PP)" from the dropdown</li>
+                        <li>Enter arrival time, burst time, and priority (comma-separated)</li>
+                        <li>Click "Calculate" to see the results and Gantt chart</li>
+                    </ol>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</body>
+
+</html>
